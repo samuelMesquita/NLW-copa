@@ -22,6 +22,20 @@ async function bootstrap (){
         }
     });
 
+    
+    fastify.get("/users/count",async ()=>{
+        return {
+            pools: await prisma.user.count()
+        }
+    });
+
+    
+    fastify.get("/guesses/count",async ()=>{
+        return {
+            pools: await prisma.guess.count()
+        }
+    });
+
     fastify.post("/pools",async (request, response)=>{
         const validationRequest = z.object({
             title: z.string(),
@@ -32,14 +46,14 @@ async function bootstrap (){
         const generate = new ShortUniqueId({length: 6});
         const code = String(generate()).toUpperCase();
 
-        prisma.pool.create({
+        await prisma.pool.create({
             data:{
                 title,
                 code
             }
         });
 
-        return response.status(201).send({title});
+        return response.status(201).send({ code });
     });
 
     await fastify.listen({port:3333 /*, host: '0.0.0.0'*/});
